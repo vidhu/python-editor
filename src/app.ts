@@ -7,9 +7,17 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const getDockerSocket = (): string => {
+  if (process.env.DOCKER_SOCKET) {
+    return process.env.DOCKER_SOCKET;
+  } if (process.platform === 'win32') {
+    return '//./pipe/docker_engine';
+  }
+  return '/var/run/docker.sock';
+};
 
 const docker1 = new Docker({
-  socketPath: 'npipe:////./pipe/docker_engine',
+  socketPath: getDockerSocket(),
 });
 
 app.get('/', async (req, res) => {
